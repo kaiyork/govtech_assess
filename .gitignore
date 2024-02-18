@@ -1,0 +1,2 @@
+# Ignore Terraform system files
+*.terraform
