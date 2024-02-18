@@ -82,59 +82,61 @@ resource "aws_route_table_association" "public-subnet-2-association" {
   route_table_id = aws_route_table.public-route-table.id
 }
 
+resource "aws_eip" "nat-eip" {
+  vpc = true
+   tags = {
+      Name = "nat-eip"
+      }
+}
+
+resource "aws_nat_gateway" "nat-gateway" {
+  allocation_id = aws_eip.nat-eip.id
+  subnet_id     = aws_subnet.public-subnet-1.id
+  tags = {
+      Name = "nat-gateway"
+      }
+}
 
 
-# resource "aws_route" "default_route" {
-#   route_table_id         = aws_route_table.dev_public_rt.id
-#   destination_cidr_block = "0.0.0.0/0"
-#   gateway_id             = aws_internet_gateway.internet_gw.id
-# }
+resource "aws_security_group" "dev_sg" {
+  name        = "dev_sg"
+  description = "dev security group"
+  vpc_id      = aws_vpc.main.id
 
-# resource "aws_route_table_association" "dev_public_association" {
-#   subnet_id      = aws_subnet.public_subnet.id
-#   route_table_id = aws_route_table.dev_public_rt.id
-
-# }
-
-# resource "aws_security_group" "dev_sg" {
-#   name        = "dev_sg"
-#   description = "dev security group"
-#   vpc_id      = aws_vpc.main.id
-
-#   ingress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
 
-# }
+}
 
-# resource "aws_key_pair" "terra_auth" {
-#   key_name   = "authkey"
-#   public_key = file("~/.ssh/authkey.pub")
-# }
+resource "aws_key_pair" "terra_auth" {
+  key_name   = "authkey"
+  public_key = file("~/.ssh/authkey.pub")
+}
 
-# resource "aws_instance" "dev_node" {
-#   instance_type = "t2.micro"
-#   ami           = data.aws_ami.ubuntu.id
-#   key_name               = aws_key_pair.terra_auth.id
-#   vpc_security_group_ids = [aws_security_group.dev_sg.id]
-#   subnet_id              = aws_subnet.public_subnet.id
-#   user_data = file("userdata.tpl")
-#   root_block_device {
-#     volume_size = 10
-#   }
-#   tags = {
-#     name = "dev-node"
-#   }
+resource "aws_instance" "dev_node" {
+  instance_type = "t2.micro"
+  ami           = data.aws_ami.ubuntu.id
+  key_name               = aws_key_pair.terra_auth.id
+  vpc_security_group_ids = [aws_security_group.dev_sg.id]
+  subnet_id              = aws_subnet.public-subnet-1.id
+  user_data = file("userdata.tpl")
+  root_block_device {
+    volume_size = 10
+  }
+  tags = {
+    name = "dev-node"
+  }
 
-# }
+}
 
