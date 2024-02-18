@@ -10,13 +10,13 @@ terraform {
 }
 
 provider "aws" {
-  region  = "us-west-2"
-  shared_credentials_file ="~/.aws/creds"
+  region                  = "ap-southeast-1"
+  shared_credentials_file = "~/.aws/creds"
 
 }
 
 resource "aws_instance" "app_server" {
-  ami           = "ami-830c94e3"
+  ami           = "ami-0f74c08b8b5effa56"
   instance_type = "t2.micro"
 
   tags = {
