@@ -133,6 +133,7 @@ resource "aws_key_pair" "terra_auth" {
 
 resource "aws_instance" "dev_node" {
   instance_type = "t2.micro"
+  count = 2
   ami           = data.aws_ami.ubuntu.id
   key_name               = aws_key_pair.terra_auth.id
   vpc_security_group_ids = [aws_security_group.dev_sg.id]
