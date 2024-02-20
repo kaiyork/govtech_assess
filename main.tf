@@ -70,7 +70,7 @@ resource "aws_internet_gateway" "internet_gw" {
   vpc_id = aws_vpc.main.id
   tags = {
     Name = "dev_internet_gateway"
-    }
+  }
 }
 
 resource "aws_route_table" "public-route-table" {
@@ -103,17 +103,17 @@ resource "aws_route_table_association" "public-subnet-3-association" {
 
 resource "aws_eip" "nat-eip" {
   vpc = true
-   tags = {
-      Name = "nat-eip"
-      }
+  tags = {
+    Name = "nat-eip"
+  }
 }
 
 resource "aws_nat_gateway" "nat-gateway" {
   allocation_id = aws_eip.nat-eip.id
   subnet_id     = aws_subnet.public-subnet-1.id
   tags = {
-      Name = "nat-gateway"
-      }
+    Name = "nat-gateway"
+  }
 }
 
 
@@ -122,18 +122,18 @@ resource "aws_security_group" "dev_sg" {
   description = "dev security group"
   vpc_id      = aws_vpc.main.id
 
- ingress {
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
     from_port   = 0
@@ -156,7 +156,7 @@ resource "aws_lb" "loadb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.dev_sg.id]
 
-  subnets = ["subnet-0a39036d186aba976", "subnet-0801b0907dfc24699","subnet-0b6f4b47bce8f6b9d"] 
+  subnets = ["subnet-0a39036d186aba976", "subnet-0801b0907dfc24699", "subnet-0b6f4b47bce8f6b9d"]
 
   enable_deletion_protection = false
 }
@@ -164,7 +164,7 @@ resource "aws_lb" "loadb" {
 resource "aws_lb_target_group" "lb_target" {
   port     = 80
   protocol = "HTTP"
-  vpc_id   = "vpc-054bc8f9b936de5a5" 
+  vpc_id   = "vpc-054bc8f9b936de5a5"
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
@@ -183,25 +183,5 @@ resource "aws_lb_listener" "front_end" {
     target_group_arn = aws_lb_target_group.lb_target.arn
     type             = "forward"
   }
-}
-
-resource "aws_cloudwatch_metric_alarm" "cpu" {
-  alarm_name          = "cpu-utilization"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "2"
-  metric_name         = "CPUUtilization"
-  namespace           = "AWS/EC2"
-  period              = "120"
-  statistic           = "Average"
-  threshold           = "80"
-  alarm_description   = "This metric checks cpu utilization"
-  alarm_actions       = [aws_sns_topic.cpu_alarm.arn]
-  dimensions = {
-    InstanceId = aws_instance.dev_node.id
-  }
-}
-
-resource "aws_sns_topic" "cpu_alarm" {
-  name = "cpu-utilization-alarm"
 }
 
