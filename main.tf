@@ -150,21 +150,6 @@ resource "aws_key_pair" "terra_auth" {
   public_key = file("~/.ssh/authkey.pub")
 }
 
-resource "aws_instance" "dev_node" {
-  instance_type = "t2.micro"
-  ami           = data.aws_ami.ubuntu.id
-  key_name               = aws_key_pair.terra_auth.id
-  vpc_security_group_ids = [aws_security_group.dev_sg.id]
-  subnet_id              = aws_subnet.public-subnet-1.id
-  user_data = file("userdata.tpl")
-  root_block_device {
-    volume_size = 10
-  }
-  tags = {
-    name = "dev-node"
-  }
-
-}
 
 resource "aws_lb" "loadb" {
   internal           = false
