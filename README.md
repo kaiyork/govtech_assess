@@ -19,6 +19,7 @@
 6. Cloudwatch alarms were added to monitor cpu utilisation of EC2.
 7. template file created to auto configure nginx server on ec2 instance.
 8. Security group rules was added for ingress and egress traffic
+9. ASG was created with accompanying cloudwatch metric created ,(ALB)
 
 
 
