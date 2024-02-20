@@ -31,6 +31,17 @@ resource "aws_subnet" "public-subnet-2" {
 
 }
 
+resource "aws_subnet" "public-subnet-3" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.5.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "ap-southeast-1c"
+  tags = {
+    Name = "dev-public-3"
+  }
+
+}
+
 resource "aws_subnet" "private-subnet-1" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.3.0/24"
@@ -52,6 +63,8 @@ resource "aws_subnet" "private-subnet-2" {
   }
 
 }
+
+
 
 resource "aws_internet_gateway" "internet_gw" {
   vpc_id = aws_vpc.main.id
@@ -81,6 +94,12 @@ resource "aws_route_table_association" "public-subnet-2-association" {
   subnet_id      = aws_subnet.public-subnet-2.id
   route_table_id = aws_route_table.public-route-table.id
 }
+
+resource "aws_route_table_association" "public-subnet-3-association" {
+  subnet_id      = aws_subnet.public-subnet-3.id
+  route_table_id = aws_route_table.public-route-table.id
+}
+
 
 resource "aws_eip" "nat-eip" {
   vpc = true
@@ -153,7 +172,7 @@ resource "aws_lb" "loadb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.dev_sg.id]
 
-  subnets = ["subnet-0a39036d186aba976", "subnet-0801b0907dfc24699"] 
+  subnets = ["subnet-0a39036d186aba976", "subnet-0801b0907dfc24699","subnet-0b6f4b47bce8f6b9d"] 
 
   enable_deletion_protection = false
 }
