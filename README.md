@@ -1,4 +1,3 @@
-# govtech_assess
 
 # Required Items For Carrying out the Assessment
 1. Amazon VPC 
