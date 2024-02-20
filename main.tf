@@ -152,7 +152,6 @@ resource "aws_key_pair" "terra_auth" {
 
 resource "aws_instance" "dev_node" {
   instance_type = "t2.micro"
-  count = 2
   ami           = data.aws_ami.ubuntu.id
   key_name               = aws_key_pair.terra_auth.id
   vpc_security_group_ids = [aws_security_group.dev_sg.id]
@@ -199,5 +198,25 @@ resource "aws_lb_listener" "front_end" {
     target_group_arn = aws_lb_target_group.lb_target.arn
     type             = "forward"
   }
+}
+
+resource "aws_cloudwatch_metric_alarm" "cpu" {
+  alarm_name          = "cpu-utilization"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = "120"
+  statistic           = "Average"
+  threshold           = "80"
+  alarm_description   = "This metric checks cpu utilization"
+  alarm_actions       = [aws_sns_topic.cpu_alarm.arn]
+  dimensions = {
+    InstanceId = aws_instance.dev_node.id
+  }
+}
+
+resource "aws_sns_topic" "cpu_alarm" {
+  name = "cpu-utilization-alarm"
 }
 
